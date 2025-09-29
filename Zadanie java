@@ -1,0 +1,121 @@
+//xml
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/editTextProdukt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Wpisz produkt" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dodaj produkt"
+        android:onClick="dodajProduktDoListy" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wyczyść listę"
+        android:onClick="wyczyscListe" />
+
+    <TextView
+        android:id="@+id/textViewLista"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:text="Twoja lista jest pusta."
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/licznikProduktow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="Liczba produktów: 0"
+        android:textSize="16sp" />
+
+</LinearLayout>
+
+
+
+//java
+
+
+
+
+package com.example.lista;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText editTextProdukt;
+    private TextView textViewLista;
+    private TextView licznikProduktow;
+    private ArrayList<String> zakupy = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextProdukt = findViewById(R.id.editTextProdukt);
+        textViewLista = findViewById(R.id.textViewLista);
+        licznikProduktow = findViewById(R.id.licznikProduktow);
+    }
+
+    public void dodajProduktDoListy(View view) {
+        String nowyProdukt = editTextProdukt.getText().toString().trim();
+
+        // Zadanie 1: nie dodawaj, jeśli pusty
+        if (nowyProdukt.isEmpty()) {
+            Toast.makeText(this, "Nie można dodać pustego produktu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Zadanie 4: ograniczenie do 5
+        if (zakupy.size() >= 5) {
+            Toast.makeText(this, "Osiągnięto maksymalną liczbę produktów!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // dodaj
+        zakupy.add(nowyProdukt);
+        editTextProdukt.setText("");
+        wyswietlListe();
+    }
+
+    private void wyswietlListe() {
+        if (zakupy.isEmpty()) {
+            textViewLista.setText("Twoja lista jest pusta.");
+            licznikProduktow.setText("Liczba produktów: 0");
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < zakupy.size(); i++) {
+                sb.append(i + 1).append(". ").append(zakupy.get(i)).append("\n");
+            }
+            textViewLista.setText(sb.toString());
+            licznikProduktow.setText("Liczba produktów: " + zakupy.size());
+        }
+    }
+
+    public void wyczyscListe(View view) {
+        zakupy.clear();
+        textViewLista.setText("Twoja lista jest pusta.");
+        licznikProduktow.setText("Liczba produktów: 0");
+        Toast.makeText(this, "Lista została wyczyszczona", Toast.LENGTH_SHORT).show();
+    }
+}
