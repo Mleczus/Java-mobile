@@ -1,0 +1,264 @@
+//xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Konfigurator Pizzy"/>
+
+    //Pizza rozmiar
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wybierz rozmiar:" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupRozmiar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/radioMala"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mała (20 PLN)"
+            android:onClick="aktualizujCene" />
+
+        <RadioButton
+            android:id="@+id/radioSrednia"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Średnia (30 PLN)"
+            android:checked="true"
+            android:onClick="aktualizujCene" />
+
+        <RadioButton
+            android:id="@+id/radioDuza"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duża (40 PLN)"
+            android:onClick="aktualizujCene" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/tekstCenaBazowa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cena podstawowa: 30.00 PLN" />
+
+    //Dodatki
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wybierz dodatki (+3 PLN każdy):" />
+
+    <CheckBox
+        android:id="@+id/checkboxSer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dodatkowy ser"
+        android:onClick="aktualizujCene" />
+
+    <CheckBox
+        android:id="@+id/checkboxSzynka"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Szynka"
+        android:onClick="aktualizujCene" />
+
+    <CheckBox
+        android:id="@+id/checkboxPieczarki"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pieczarki"
+        android:onClick="aktualizujCene" />
+
+    //Sosy
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wybierz sos:" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupSos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/radioCzosnkowy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sos czosnkowy (+2 PLN)"
+            android:onClick="aktualizujCene" />
+
+        <RadioButton
+            android:id="@+id/radioPomidorowy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sos pomidorowy (+2 PLN)"
+            android:onClick="aktualizujCene" />
+
+        <RadioButton
+            android:id="@+id/radioBezSosu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bez sosu"
+            android:checked="true"
+            android:onClick="aktualizujCene" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/tekstCenaKoncowa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cena końcowa: 30.00 PLN" />
+
+    <TextView
+        android:id="@+id/tekstPodsumowanie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Brak dodatków" />
+
+    //Pełnoletność
+    <CheckBox
+        android:id="@+id/checkboxPelnoletni"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mam ukończone 18 lat"
+        android:onClick="sprawdzPelnoletnosc" />
+
+    //Przycisk Zamów
+    <Button
+        android:id="@+id/przyciskZamow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zamów"
+        android:onClick="zlozZamowienie" />
+
+</LinearLayout>
+
+
+//java
+
+package com.example.pizzaapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    private final double CENA_MALA = 20.0;
+    private final double CENA_SREDNIA = 30.0;
+    private final double CENA_DUZA = 40.0;
+    private final double CENA_DODATKU = 3.0;
+    private final double CENA_SOSU = 2.0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+    private double getCenaBazowa() {
+        RadioGroup radioGroupRozmiar = findViewById(R.id.radioGroupRozmiar);
+        int wybranyRozmiarId = radioGroupRozmiar.getCheckedRadioButtonId();
+
+        if (wybranyRozmiarId == R.id.radioMala) {
+            return CENA_MALA;
+        } else if (wybranyRozmiarId == R.id.radioSrednia) {
+            return CENA_SREDNIA;
+        } else {
+            return CENA_DUZA;
+        }
+    }
+
+    public void aktualizujCene(View view) {
+        double cenaBazowa = getCenaBazowa();
+        double cenaKoncowa = cenaBazowa;
+        String wybranyRozmiarTekst;
+
+        RadioGroup radioGroupRozmiar = findViewById(R.id.radioGroupRozmiar);
+        int wybranyRozmiarId = radioGroupRozmiar.getCheckedRadioButtonId();
+
+        if (wybranyRozmiarId == R.id.radioMala) {
+            wybranyRozmiarTekst = "Mała";
+        } else if (wybranyRozmiarId == R.id.radioSrednia) {
+            wybranyRozmiarTekst = "Średnia";
+        } else {
+            wybranyRozmiarTekst = "Duża";
+        }
+
+        // Dodatki
+        StringBuilder dodatkiTekst = new StringBuilder();
+        CheckBox ser = findViewById(R.id.checkboxSer);
+        CheckBox szynka = findViewById(R.id.checkboxSzynka);
+        CheckBox pieczarki = findViewById(R.id.checkboxPieczarki);
+
+        if (ser.isChecked()) {
+            cenaKoncowa += CENA_DODATKU;
+            dodatkiTekst.append("• Dodatkowy ser\n");
+        }
+        if (szynka.isChecked()) {
+            cenaKoncowa += CENA_DODATKU;
+            dodatkiTekst.append("• Szynka\n");
+        }
+        if (pieczarki.isChecked()) {
+            cenaKoncowa += CENA_DODATKU;
+            dodatkiTekst.append("• Pieczarki\n");
+        }
+
+        // Sos
+        RadioGroup sosGroup = findViewById(R.id.radioGroupSos);
+        int wybranySosId = sosGroup.getCheckedRadioButtonId();
+        String wybranySosTekst;
+
+        if (wybranySosId == R.id.radioCzosnkowy) {
+            cenaKoncowa += CENA_SOSU;
+            wybranySosTekst = "Sos czosnkowy";
+        } else if (wybranySosId == R.id.radioPomidorowy) {
+            cenaKoncowa += CENA_SOSU;
+            wybranySosTekst = "Sos pomidorowy";
+        } else {
+            wybranySosTekst = "Bez sosu";
+        }
+
+        // Aktualizacja tekstów
+        TextView tekstCenaBazowa = findViewById(R.id.tekstCenaBazowa);
+        TextView tekstCenaKoncowa = findViewById(R.id.tekstCenaKoncowa);
+        TextView tekstPodsumowanie = findViewById(R.id.tekstPodsumowanie);
+
+        tekstCenaBazowa.setText("Cena podstawowa: " + cenaBazowa + " PLN");
+        tekstCenaKoncowa.setText("Cena końcowa: " + cenaKoncowa + " PLN");
+
+        String podsumowanie = "Rozmiar: " + wybranyRozmiarTekst +
+                "\nSos: " + wybranySosTekst;
+
+        if (dodatkiTekst.length() > 0) {
+            podsumowanie += "\nDodatki:\n" + dodatkiTekst;
+        } else {
+            podsumowanie += "\nBrak dodatków";
+        }
+
+        tekstPodsumowanie.setText(podsumowanie);
+    }
+
+    public void sprawdzPelnoletnosc(View view) {
+        CheckBox pelnoletni = findViewById(R.id.checkboxPelnoletni);
+        Button zamow = findViewById(R.id.przyciskZamow);
+        zamow.setEnabled(pelnoletni.isChecked());
+    }
+
+    public void zlozZamowienie(View view) {
+        Toast.makeText(this, "Zamówienie przyjęte! ", Toast.LENGTH_SHORT).show();
+    }
+}
+
