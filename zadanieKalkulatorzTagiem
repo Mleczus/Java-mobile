@@ -1,0 +1,135 @@
+//xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="| KALKULATOR |"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="np. 2"
+        android:inputType="number"
+        android:id="@+id/number1"/>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/radiogroupznak">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="+"
+            android:id="@+id/dodawanie"
+            android:text="+"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="-"
+            android:id="@+id/odejmowanie"
+            android:text="-"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="*"
+            android:id="@+id/mnozenie"
+            android:text="*"/>
+    </RadioGroup>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="np. 4"
+        android:inputType="number"
+        android:id="@+id/number2"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OBLICZ"
+        android:id="@+id/oblicz"
+        android:onClick="oblicz"/>
+
+</LinearLayout>
+
+
+//java
+
+package com.example.kalkulator;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+    public void oblicz(View view){
+        EditText number1 = findViewById(R.id.number1);
+        EditText number2 = findViewById(R.id.number2);
+
+        int liczba1 = Integer.parseInt(number1.getText().toString());
+        int liczba2 = Integer.parseInt(number2.getText().toString());
+
+        RadioGroup znakGroup = findViewById(R.id.radiogroupznak);
+        int wybranyZnakId = znakGroup.getCheckedRadioButtonId();
+        RadioButton wybranyZnak = findViewById(wybranyZnakId);
+
+        String znakTag = (String) wybranyZnak.getTag();
+
+        switch(znakTag){
+            case "+":
+                double wynik_dod = liczba1 + liczba2;
+                Toast.makeText(this, "WYNIK DODAWANIA: " + wynik_dod, Toast.LENGTH_SHORT).show();
+                break;
+            case "-":
+                double wynik_odj = liczba1 - liczba2;
+                Toast.makeText(this, "WYNIK ODEJMOWANIA: " + wynik_odj, Toast.LENGTH_SHORT).show();
+                break;
+            case "*":
+                double wynik_mnz = liczba1 * liczba2;
+                Toast.makeText(this, "WYNIK MNOŻENIA: " + wynik_mnz, Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                Toast.makeText(this, "Złe dane", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+}
