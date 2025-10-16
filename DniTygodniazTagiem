@@ -1,0 +1,121 @@
+//xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="| DNI TYGODNIA |"
+        android:textSize="26sp"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="np.6"
+        android:id="@+id/dzien"
+        android:tag="dzientag"
+        android:inputType="number"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Sprawdz"
+        android:text="Sprawdź"
+        android:onClick="Sprawdz"/>
+</LinearLayout>
+
+
+//java
+
+package com.example.dnitygodnia;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+    public void Sprawdz(View view){
+        EditText dzien = findViewById(R.id.dzien);
+        String tekst = dzien.getText().toString();
+        dzien.setTag(tekst);
+        String dzienTag = (String) dzien.getTag();
+
+
+//        switch (dzienTag){
+//            case "1":
+//                Toast.makeText(this, "PONIEDZIAŁEK", Toast.LENGTH_SHORT).show();
+//                break;
+//            case "2":
+//                Toast.makeText(this, "WTOREK", Toast.LENGTH_SHORT).show();
+//                break;
+//            case "3":
+//                Toast.makeText(this, "ŚRODA", Toast.LENGTH_SHORT).show();
+//                break;
+//            case "4":
+//                Toast.makeText(this, "CZWARTEK", Toast.LENGTH_SHORT).show();
+//                break;
+//            case "5":
+//                Toast.makeText(this, "PIĄTEK", Toast.LENGTH_SHORT).show();
+//                break;
+//            case "6":
+//                Toast.makeText(this, "SOBOTA", Toast.LENGTH_SHORT).show();
+//                break;
+//            case "7":
+//                Toast.makeText(this, "NIEDZIELA", Toast.LENGTH_SHORT).show();
+//                break;
+//            default:
+//                Toast.makeText(this, "TYLKO LICZBY Z ZAKRESU 1-7", Toast.LENGTH_SHORT).show();
+//        }
+
+        switch (dzienTag) {
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+                Toast.makeText(this, "DZIEŃ ROBOCZY!", Toast.LENGTH_SHORT).show();
+                break;
+            case "6":
+            case "7":
+                Toast.makeText(this, "WEEKEND!", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                Toast.makeText(this, "TYLKO LICZBY Z ZAKRESU 1-7", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
+//ZAD 4: Bo brak break powoduje fallthrough czyli po
+// wykonaniu case 1 kod przechodzi od razu do case 2,
+// potem case 3, aż znajdzie jakikolwiek kolejny break
+// lub koniec switch.
+//WYPISZE: "PONIEDZIAŁEK,WTOREK,ŚRODA"
