@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
-    android:gravity="top|center_horizontal"
-    android:background="#FFFBEA">
+    android:gravity="center">
 
     <!-- Tytuł -->
     <TextView
@@ -157,6 +156,14 @@
         android:onClick="sprawdzPelnoletnosc"
         android:layout_marginTop="20dp" />
 
+    <!--Zniżka studencka (-10%) -->
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/znizka"
+        android:text="Zniżka studencka(-10%)"
+        android:onClick="dodajZnizke"/>
+
     <!-- Przycisk Zamów -->
     <Button
         android:id="@+id/przyciskZamow"
@@ -168,8 +175,6 @@
         android:layout_marginTop="10dp" />
 
 </LinearLayout>
-
-
 
 
 //java
@@ -193,8 +198,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Checkbox od zniżki
+        CheckBox znizka = findViewById(R.id.znizka);
+        znizka.setOnClickListener(v -> {
+            aktualizujCene(v);
+        });
     }
 
+    // Cena bazowa w zależności od rozmiaru
     private double getCenaBazowa() {
         RadioGroup radioGroupRozmiar = findViewById(R.id.radioGroupRozmiar);
         int wybranyRozmiarId = radioGroupRozmiar.getCheckedRadioButtonId();
@@ -208,14 +220,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Aktualizacja ceny
     public void aktualizujCene(View view) {
         double cenaBazowa = getCenaBazowa();
         double cenaKoncowa = cenaBazowa;
-        String wybranyRozmiarTekst;
 
         // --- Rozmiar ---
         RadioGroup radioGroupRozmiar = findViewById(R.id.radioGroupRozmiar);
         int wybranyRozmiarId = radioGroupRozmiar.getCheckedRadioButtonId();
+        String wybranyRozmiarTekst;
 
         if (wybranyRozmiarId == R.id.radioMala) {
             wybranyRozmiarTekst = "Mała";
@@ -226,25 +239,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // --- Dodatki ---
-        StringBuilder dodatkiTekst = new StringBuilder();
         CheckBox ser = findViewById(R.id.checkboxSer);
         CheckBox szynka = findViewById(R.id.checkboxSzynka);
         CheckBox pieczarki = findViewById(R.id.checkboxPieczarki);
 
+        String dodatkiTekst = "";
+
         if (ser.isChecked()) {
             cenaKoncowa += CENA_DODATKU;
-            dodatkiTekst.append("• Dodatkowy ser\n");
+            dodatkiTekst += "• Dodatkowy ser\n";
         }
         if (szynka.isChecked()) {
             cenaKoncowa += CENA_DODATKU;
-            dodatkiTekst.append("• Szynka\n");
+            dodatkiTekst += "• Szynka\n";
         }
         if (pieczarki.isChecked()) {
             cenaKoncowa += CENA_DODATKU;
-            dodatkiTekst.append("• Pieczarki\n");
+            dodatkiTekst += "• Pieczarki\n";
+        }
+        if (dodatkiTekst.equals("")) {
+            dodatkiTekst = "Brak dodatków";
         }
 
-        // --- Sos (refaktoryzacja z tag + switch-case) ---
+        // --- Sos (switch na tagi) ---
         RadioGroup sosGroup = findViewById(R.id.radioGroupSos);
         int wybranySosId = sosGroup.getCheckedRadioButtonId();
         RadioButton wybranySos = findViewById(wybranySosId);
@@ -254,17 +271,24 @@ public class MainActivity extends AppCompatActivity {
 
         switch (sosTag) {
             case "czosnkowy":
-                cenaKoncowa += CENA_SOSU;
                 wybranySosTekst = "Sos czosnkowy";
+                cenaKoncowa += CENA_SOSU;
                 break;
             case "pomidorowy":
-                cenaKoncowa += CENA_SOSU;
                 wybranySosTekst = "Sos pomidorowy";
+                cenaKoncowa += CENA_SOSU;
                 break;
             case "bez_sosu":
             default:
                 wybranySosTekst = "Bez sosu";
                 break;
+        }
+
+        // --- Zniżka ---
+        CheckBox znizka = findViewById(R.id.znizka);
+        if (znizka.isChecked()) {
+            cenaKoncowa *= 0.9; // 10% zniżki
+            Toast.makeText(this, "Zastosowano rabat 10%", Toast.LENGTH_SHORT).show();
         }
 
         // --- Aktualizacja tekstów ---
@@ -273,26 +297,23 @@ public class MainActivity extends AppCompatActivity {
         TextView tekstPodsumowanie = findViewById(R.id.tekstPodsumowanie);
 
         tekstCenaBazowa.setText("Cena podstawowa: " + cenaBazowa + " PLN");
-        tekstCenaKoncowa.setText("Cena końcowa: " + cenaKoncowa + " PLN");
+        tekstCenaKoncowa.setText("Cena końcowa: " + String.format("%.2f", cenaKoncowa) + " PLN");
 
         String podsumowanie = "Rozmiar: " + wybranyRozmiarTekst +
-                "\nSos: " + wybranySosTekst;
-
-        if (dodatkiTekst.length() > 0) {
-            podsumowanie += "\nDodatki:\n" + dodatkiTekst;
-        } else {
-            podsumowanie += "\nBrak dodatków";
-        }
+                "\nSos: " + wybranySosTekst +
+                "\nDodatki:\n" + dodatkiTekst;
 
         tekstPodsumowanie.setText(podsumowanie);
     }
 
+    // --- Pełnoletność ---
     public void sprawdzPelnoletnosc(View view) {
         CheckBox pelnoletni = findViewById(R.id.checkboxPelnoletni);
         Button zamow = findViewById(R.id.przyciskZamow);
         zamow.setEnabled(pelnoletni.isChecked());
     }
 
+    // --- Zamówienie ---
     public void zlozZamowienie(View view) {
         Toast.makeText(this, "Zamówienie przyjęte! Smacznego 🍕", Toast.LENGTH_SHORT).show();
     }
