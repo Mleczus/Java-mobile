@@ -1,0 +1,87 @@
+//xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ZMIANA TEKSTU" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tekst" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Przycisk 1"
+        android:id="@+id/przycisk1" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Przycisk 2"
+        android:id="@+id/przycisk2" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Przycisk 3"
+        android:id="@+id/przycisk3" />
+
+</LinearLayout>
+
+//java
+
+package com.example.zmianatekstu;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
+            Button przycisk1Lambda = findViewById(R.id.przycisk1);
+            Button przycisk2Lambda = findViewById(R.id.przycisk2);
+            Button przycisk3Lambda = findViewById(R.id.przycisk3);
+
+            przycisk1Lambda.setOnClickListener(v -> {
+                aktualizujTekst("Przycisk 1!");
+            });
+
+            przycisk2Lambda.setOnClickListener(v ->{
+                aktualizujTekst("Przycisk 2!");
+            });
+
+            przycisk3Lambda.setOnClickListener(v -> {
+                aktualizujTekst("Przycisk 3!");
+            });
+
+    }
+    private void aktualizujTekst(String wiadomosc){
+        TextView tekst = findViewById(R.id.tekst);
+        tekst.setText(wiadomosc);
+    }
+}
