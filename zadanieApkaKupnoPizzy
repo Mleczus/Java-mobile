@@ -1,6 +1,8 @@
 //xml
 
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -174,7 +176,16 @@
         android:onClick="zlozZamowienie"
         android:layout_marginTop="10dp" />
 
+    <!-- Czyszczenie formularza -->
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wyczyść formularz"
+        android:id="@+id/wyczysc"
+        android:onClick="wyczyscFormularz"/>
 </LinearLayout>
+
 
 
 //java
@@ -203,6 +214,37 @@ public class MainActivity extends AppCompatActivity {
         CheckBox znizka = findViewById(R.id.znizka);
         znizka.setOnClickListener(v -> {
             aktualizujCene(v);
+        });
+
+        //Czyszczenie formularza
+        Button czyszczenieLambda = findViewById(R.id.wyczysc);
+        RadioGroup radioGroupRozmiar = findViewById(R.id.radioGroupRozmiar);
+        RadioGroup radioGroupSos = findViewById(R.id.radioGroupSos);
+        CheckBox checkboxPelnoletni = findViewById(R.id.checkboxPelnoletni);
+        TextView tekstCenaBazowa = findViewById(R.id.tekstCenaBazowa);
+        TextView tekstCenaKoncowa = findViewById(R.id.tekstCenaKoncowa);
+        TextView tekstPodsumowanie = findViewById(R.id.tekstPodsumowanie);
+        CheckBox ser = findViewById(R.id.checkboxSer);
+        CheckBox szynka = findViewById(R.id.checkboxSzynka);
+        CheckBox pieczarki = findViewById(R.id.checkboxPieczarki);
+
+        czyszczenieLambda.setOnClickListener(v -> {
+            //Zniżka
+            znizka.setChecked(false);
+            //Rozmiar
+            radioGroupRozmiar.check(R.id.radioMala);
+            //Sos
+            radioGroupSos.check(R.id.radioBezSosu);
+            //Pełnoletność
+            checkboxPelnoletni.setChecked(false);
+            //Ceny
+            tekstCenaBazowa.setText("");
+            tekstCenaKoncowa.setText("");
+            tekstPodsumowanie.setText("");
+            //Dodatki
+            ser.setChecked(false);
+            szynka.setChecked(false);
+            pieczarki.setChecked(false);
         });
     }
 
@@ -317,4 +359,6 @@ public class MainActivity extends AppCompatActivity {
     public void zlozZamowienie(View view) {
         Toast.makeText(this, "Zamówienie przyjęte! Smacznego 🍕", Toast.LENGTH_SHORT).show();
     }
+
 }
+
