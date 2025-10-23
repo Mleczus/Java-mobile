@@ -133,6 +133,19 @@
     </RadioGroup>
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wybierz ciasto:"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"/>
+
+    <Spinner
+        android:id="@+id/ciastoSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/rodzaj_ciasta"/>
+
+    <TextView
         android:id="@+id/tekstCenaKoncowa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -215,6 +228,17 @@ public class MainActivity extends AppCompatActivity {
         znizka.setOnClickListener(v -> {
             aktualizujCene(v);
         });
+
+        Spinner spinnerCiasto = findViewById(R.id.ciastoSpinner);
+        spinnerCiasto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                aktualizujCene(view);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
 
         //Czyszczenie formularza
         Button czyszczenieLambda = findViewById(R.id.wyczysc);
@@ -326,6 +350,21 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
+        // --- Rodzaj ciasta --
+        Spinner spinnerCiasto = findViewById(R.id.ciastoSpinner);
+        int wybranaPozycjaCiasta = spinnerCiasto.getSelectedItemPosition();
+
+        switch(wybranaPozycjaCiasta){
+            case 0:
+                break;
+            case 1:
+                cenaKoncowa += 2.0;
+                break;
+            case 2:
+                cenaKoncowa += 4.0;
+                break;
+        }
+
         // --- Zniżka ---
         CheckBox znizka = findViewById(R.id.znizka);
         if (znizka.isChecked()) {
@@ -338,12 +377,14 @@ public class MainActivity extends AppCompatActivity {
         TextView tekstCenaKoncowa = findViewById(R.id.tekstCenaKoncowa);
         TextView tekstPodsumowanie = findViewById(R.id.tekstPodsumowanie);
 
+        String wybraneCiasto = spinnerCiasto.getSelectedItem().toString();
+
         tekstCenaBazowa.setText("Cena podstawowa: " + cenaBazowa + " PLN");
         tekstCenaKoncowa.setText("Cena końcowa: " + String.format("%.2f", cenaKoncowa) + " PLN");
 
         String podsumowanie = "Rozmiar: " + wybranyRozmiarTekst +
                 "\nSos: " + wybranySosTekst +
-                "\nDodatki:\n" + dodatkiTekst;
+                "\nDodatki:\n" + dodatkiTekst + "\nCiasto: " + wybraneCiasto;
 
         tekstPodsumowanie.setText(podsumowanie);
     }
@@ -362,3 +403,14 @@ public class MainActivity extends AppCompatActivity {
 
 }
 
+
+//strings.xml
+
+<resources>
+    <string name="app_name">pizzaapp</string>
+    <string-array name="rodzaj_ciasta">
+        <item>Cienkie</item>
+        <item>Grube (+2.00 PLN)</item>
+        <item>Pełnoziarniste (+4.00 PLN)</item>
+    </string-array>
+</resources>
