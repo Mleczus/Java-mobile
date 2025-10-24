@@ -2,6 +2,10 @@
 
 <?xml version="1.0" encoding="utf-8"?>
 
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="vertical">
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -145,6 +149,13 @@
         android:layout_height="wrap_content"
         android:entries="@array/rodzaj_ciasta"/>
 
+    <CheckBox
+        android:id="@+id/checkBoxWlasnejRoboty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ciasto własnej roboty"
+        android:onClick="ukryjSpinner"/>
+
     <TextView
         android:id="@+id/tekstCenaKoncowa"
         android:layout_width="wrap_content"
@@ -198,6 +209,8 @@
         android:id="@+id/wyczysc"
         android:onClick="wyczyscFormularz"/>
 </LinearLayout>
+</ScrollView>
+
 
 
 
@@ -238,6 +251,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
+
+        spinnerCiasto.setSelection(1);
 
 
         //Czyszczenie formularza
@@ -401,6 +416,15 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Zamówienie przyjęte! Smacznego 🍕", Toast.LENGTH_SHORT).show();
     }
 
+    public void ukryjSpinner(View view){
+        Spinner spinnerCiasto = findViewById(R.id.ciastoSpinner);
+        CheckBox checkboxwlasneciasto = findViewById(R.id.checkBoxWlasnejRoboty);
+        if(checkboxwlasneciasto.isChecked()){
+            spinnerCiasto.setVisibility(View.GONE);
+        }else if(!checkboxwlasneciasto.isChecked()){
+            spinnerCiasto.setVisibility(View.VISIBLE);
+        }
+    }
 }
 
 
