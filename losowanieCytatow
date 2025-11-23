@@ -16,14 +16,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tekstCytatu"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        style="@style/cytat"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tekstAutora"
         android:textSize="15sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        style="@style/autor"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -31,8 +33,14 @@
         android:id="@+id/przyciskLosuj"
         android:text="Losuj kolejny cytat"/>
 
-</LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/przyciskUlubione"
+        android:text="Dodaj do ulubionych"
+        style="@style/dodajdoulu"/>
 
+</LinearLayout>
 
 
 
@@ -43,6 +51,7 @@ package com.example.generatorcytatow;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,6 +64,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     private ArrayList<Cytat> listaCytatow = new ArrayList<>();
+    private ArrayList<Cytat> ulubioneCytaty = new ArrayList<>();
     private Random randomGenerator = new Random();
 
     @Override
@@ -69,18 +79,31 @@ public class MainActivity extends AppCompatActivity {
         });
         przygotujDaneCytatow();
 
+        losujCytat();
+
         TextView cytat = findViewById(R.id.tekstCytatu);
         TextView autor = findViewById(R.id.tekstAutora);
 
+        Button przycisk2 = findViewById(R.id.przyciskUlubione);
+        przycisk2.setOnClickListener(v -> {
+            String c = cytat.getText().toString();
+            String a = autor.getText().toString();
+
+            if(!c.isEmpty() && !a.isEmpty()){
+                ulubioneCytaty.add(new Cytat(c, a));
+                Toast.makeText(this, "Dodano cytat do ulubionych", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         Button przycisk = findViewById(R.id.przyciskLosuj);
         przycisk.setOnClickListener(v -> {
-            if(!listaCytatow.isEmpty()){
-                int losowyIndeks = randomGenerator.nextInt(listaCytatow.size());
-                Cytat losowyCytat = listaCytatow.get(losowyIndeks);
-                cytat.setText(losowyCytat.tresc);
-                autor.setText(losowyCytat.autor);
-            }
-        }
+                    if(!listaCytatow.isEmpty()){
+                        int losowyIndeks = randomGenerator.nextInt(listaCytatow.size());
+                        Cytat losowyCytat = listaCytatow.get(losowyIndeks);
+                        cytat.setText(losowyCytat.tresc);
+                        autor.setText(losowyCytat.autor);
+                    }
+                }
         );
     }
 
@@ -91,9 +114,18 @@ public class MainActivity extends AppCompatActivity {
         listaCytatow.add(new Cytat("Myślę, więc jestem.", "Kartezjusz"));
         // ... dodaj co najmniej dwa inne cytaty
     }
+
+    private void losujCytat(){
+        int losowyIndeks = randomGenerator.nextInt(listaCytatow.size());
+        Cytat losowyCytat = listaCytatow.get(losowyIndeks);
+        TextView cytat = findViewById(R.id.tekstCytatu);
+        TextView autor = findViewById(R.id.tekstAutora);
+
+        cytat.setText(losowyCytat.tresc);
+        autor.setText(losowyCytat.autor);
+
+    }
 }
-
-
 
 
 
@@ -113,3 +145,44 @@ public class Cytat {
         this.autor = autor;
     }
 }
+
+
+
+//colors.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="autor">#0090FF</color>
+    <color name="dodajdoulu">#FFE600</color>
+</resources>
+
+
+
+//themes.xml
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Generatorcytatow" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="cytat">
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="autor">
+        <item name="android:color">@color/autor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="dodajdoulu">
+        <item name="android:backgroundTint">@color/dodajdoulu</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="Theme.Generatorcytatow" parent="Base.Theme.Generatorcytatow" />
+</resources>
