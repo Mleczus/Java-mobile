@@ -1,0 +1,179 @@
+//xml
+
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="| KREATOR POSTACI |"
+            android:textSize="30sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="------- IMIE -------"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Podaj imię postaci..."
+            android:id="@+id/imiePostaci"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="------- PŁEĆ -------"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/plecPostaci">
+
+            <RadioButton
+                android:id="@+id/kobieta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kobieta"/>
+
+            <RadioButton
+                android:id="@+id/mezczyzna"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mężczyzna"/>
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="------- KLASA -------"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <Spinner
+            android:id="@+id/spinner_klasa_postaci"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/klasa_postaci"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="------- ABILITKI -------"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <CheckBox
+            android:id="@+id/wlamywanie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Włamywanie"/>
+
+        <CheckBox
+            android:id="@+id/alchemia"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alchemia"/>
+
+        <CheckBox
+            android:id="@+id/kowalstwo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kowalstwo"/>
+
+        <Button
+            android:id="@+id/stworzPostac"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stwórz postać"
+            android:onClick="stworzPostac"/>
+    </LinearLayout>
+
+</ScrollView>
+
+
+
+
+//java Main
+
+
+package com.example.generator_postaci_rpg;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+    public void stworzPostac(View view){
+        EditText imiePostaci = findViewById(R.id.imiePostaci);
+
+        RadioGroup plecPostaciRadioGroup = findViewById(R.id.plecPostaci);
+        int wybranyId = plecPostaciRadioGroup.getCheckedRadioButtonId();
+
+        Spinner klasaPostaci = findViewById(R.id.spinner_klasa_postaci);
+        String wybranaKlasaPostaci = klasaPostaci.getSelectedItem().toString();
+
+        CheckBox wlamywaniePostac = findViewById(R.id.wlamywanie);
+        CheckBox alchemiaPostac = findViewById(R.id.alchemia);
+        CheckBox kowalstwoPostac = findViewById(R.id.kowalstwo);
+
+
+    }
+}
+
+
+
+//strings.xml
+
+
+<resources>
+    <string name="app_name">generator_postaci_rpg</string>
+    <string-array name="klasa_postaci">
+        <item>Człowiek</item>
+        <item>Elf</item>
+        <item>Krasnolud</item>
+        <item>Ork</item>
+    </string-array>
+</resources>
