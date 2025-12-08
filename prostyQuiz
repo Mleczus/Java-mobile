@@ -1,0 +1,83 @@
+postac.java
+
+package com.example.prostyquiz;
+
+import java.util.ArrayList;
+
+public class Pytanie {
+
+    private String tresc;
+    private ArrayList<String> odpowiedzi;
+    private int indeksPoprawnej;
+
+    public Pytanie(String tresc, ArrayList<String> odpowiedzi, int indeksPoprawnej) {
+        this.tresc = tresc;
+        this.odpowiedzi = odpowiedzi;
+        this.indeksPoprawnej = indeksPoprawnej;
+    }
+
+    public String getTresc() {
+        return tresc;
+    }
+
+    public ArrayList<String> getOdpowiedzi() {
+        return odpowiedzi;
+    }
+
+    public int getIndeksPoprawnej() {
+        return indeksPoprawnej;
+    }
+}
+
+
+
+
+
+xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/tekstNumerPytania"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pytanie 1/5"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/tekstTrescPytania"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Treść pytania"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroupOdpowiedzi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp">
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/przyciskSprawdz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sprawdź odpowiedź" />
+
+    <TextView
+        android:id="@+id/tekstWynik"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wynik: 0"
+        android:textSize="18sp"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>
