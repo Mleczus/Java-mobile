@@ -1,4 +1,344 @@
-postac.java
+xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutGlowny"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tekstNumerPytania"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pytanie nr 1"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        style="?android:attr/progressBarStyleHorizontal" />
+
+
+    <TextView
+        android:id="@+id/tekstTrescPytania"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Treść pytania"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupOdpowiedzi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/layoutCheckbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp">
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tekstWynik"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wynik: 0"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/przyciskSprawdz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sprawdź odpowiedź"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/przyciskZagrajPonownie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zagraj ponownie"
+        android:visibility="gone" />
+
+</LinearLayout>
+
+
+
+mainactivity:
+
+package com.example.prostyquiz;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ArrayList<Pytanie> listaPytan;
+    private int aktualnyIndeksPytania = 0;
+    private int wynik = 0;
+    private ArrayList<Integer> wybraneOdpowiedzi = new ArrayList<>();
+    private long startTime;
+
+    TextView text_numer_pytania;
+    TextView text_tresc_pytania;
+    RadioGroup radioGroup;
+    LinearLayout layoutCheckbox;
+    TextView text_wynik;
+    Button sprawdz;
+    Button zagrajPonownie;
+    ProgressBar progressBar;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
+        text_numer_pytania = findViewById(R.id.tekstNumerPytania);
+        text_tresc_pytania = findViewById(R.id.tekstTrescPytania);
+        radioGroup = findViewById(R.id.radioGroupOdpowiedzi);
+        layoutCheckbox = findViewById(R.id.layoutCheckbox);
+        text_wynik = findViewById(R.id.tekstWynik);
+        sprawdz = findViewById(R.id.przyciskSprawdz);
+        zagrajPonownie = findViewById(R.id.przyciskZagrajPonownie);
+        progressBar = findViewById(R.id.progressBar);
+
+        zagrajPonownie.setVisibility(View.GONE);
+
+        startTime = System.currentTimeMillis();
+
+        zagrajPonownie.setOnClickListener(v -> resetQuiz());
+
+        sprawdz.setOnClickListener(v -> {
+            zapiszWybor();
+            przejdzDoNastepnegoPytania();
+        });
+
+        przygotujPytania();
+        wyswietlPytanie();
+    }
+
+    private void przygotujPytania() {
+        listaPytan = new ArrayList<>();
+
+        ArrayList<String> odp1 = new ArrayList<>();
+        odp1.add("3");
+        odp1.add("6");
+        odp1.add("7");
+        listaPytan.add(new Pytanie("Ile dzieci zabił William Afton?", odp1, 1));
+
+        ArrayList<String> odp2 = new ArrayList<>();
+        odp2.add("Fredbear");
+        odp2.add("Chica");
+        odp2.add("Foxy");
+        ArrayList<Integer> poprawne2 = new ArrayList<>();
+        poprawne2.add(0);
+        poprawne2.add(2);
+        listaPytan.add(new Pytanie("Moje ulubione animatroniki?(wielokrotny wybór)?", odp2, poprawne2, true));
+
+        ArrayList<String> odp3 = new ArrayList<>();
+        odp3.add("Fredbear");
+        odp3.add("Mangle");
+        odp3.add("Balloon Boy");
+        listaPytan.add(new Pytanie("Kto był sprawcą The Bite of 83?", odp3, 0));
+    }
+
+    private void wyswietlPytanie() {
+        if (aktualnyIndeksPytania >= listaPytan.size()) {
+            wyswietlWynikKoncowy();
+            return;
+        }
+
+        Pytanie aktualne = listaPytan.get(aktualnyIndeksPytania);
+
+        text_numer_pytania.setText("Pytanie nr " + (aktualnyIndeksPytania + 1) + "/" + listaPytan.size());
+        text_tresc_pytania.setText(aktualne.getTresc());
+
+        if (aktualnyIndeksPytania == listaPytan.size() - 1) {
+            sprawdz.setText("Zakończ quiz");
+        } else {
+            sprawdz.setText("Dalej");
+        }
+
+        radioGroup.clearCheck();
+        radioGroup.removeAllViews();
+        layoutCheckbox.removeAllViews();
+
+        zablokujOdpowiedzi(false);
+
+        if (aktualne.isCzyWielokrotnyWybor()) {
+            radioGroup.setVisibility(View.GONE);
+            layoutCheckbox.setVisibility(View.VISIBLE);
+            for (int i = 0; i < aktualne.getOdpowiedzi().size(); i++) {
+                CheckBox cb = new CheckBox(this);
+                cb.setText(aktualne.getOdpowiedzi().get(i));
+                cb.setBackgroundResource(R.color.normalna_odpowiedz);
+                layoutCheckbox.addView(cb);
+            }
+        } else {
+            layoutCheckbox.setVisibility(View.GONE);
+            radioGroup.setVisibility(View.VISIBLE);
+            for (int i = 0; i < aktualne.getOdpowiedzi().size(); i++) {
+                RadioButton rb = new RadioButton(this);
+                rb.setText(aktualne.getOdpowiedzi().get(i));
+                rb.setBackgroundResource(R.color.normalna_odpowiedz);
+                rb.setEnabled(true);
+                radioGroup.addView(rb);
+            }
+        }
+
+        progressBar.setMax(listaPytan.size());
+        progressBar.setProgress(aktualnyIndeksPytania + 1);
+    }
+
+    private void zapiszWybor() {
+        Pytanie aktualne = listaPytan.get(aktualnyIndeksPytania);
+
+        if (aktualne.isCzyWielokrotnyWybor()) {
+            ArrayList<Integer> wybrane = new ArrayList<>();
+            for (int i = 0; i < layoutCheckbox.getChildCount(); i++) {
+                CheckBox cb = (CheckBox) layoutCheckbox.getChildAt(i);
+                if (cb.isChecked()) {
+                    wybrane.add(i);
+                }
+            }
+            if (wybrane.size() == 0) wybraneOdpowiedzi.add(-1);
+            else wybraneOdpowiedzi.add(-2);
+        } else {
+            int idZaznaczonego = radioGroup.getCheckedRadioButtonId();
+            if (idZaznaczonego == -1) {
+                wybraneOdpowiedzi.add(-1);
+            } else {
+                int indeksWybranej = radioGroup.indexOfChild(findViewById(idZaznaczonego));
+                wybraneOdpowiedzi.add(indeksWybranej);
+            }
+        }
+    }
+
+    private void przejdzDoNastepnegoPytania() {
+        aktualnyIndeksPytania++;
+        wyswietlPytanie();
+    }
+
+    private void zablokujOdpowiedzi(boolean czyZablokowac) {
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            radioGroup.getChildAt(i).setEnabled(!czyZablokowac);
+        }
+        for (int i = 0; i < layoutCheckbox.getChildCount(); i++) {
+            layoutCheckbox.getChildAt(i).setEnabled(!czyZablokowac);
+        }
+    }
+
+    private void wyswietlWynikKoncowy() {
+        wynik = 0;
+        for (int i = 0; i < listaPytan.size(); i++) {
+            Pytanie p = listaPytan.get(i);
+            int wybor = wybraneOdpowiedzi.get(i);
+
+            if (p.isCzyWielokrotnyWybor()) {
+                boolean poprawnie = true;
+                for (int j = 0; j < p.getIndeksyPoprawnych().size(); j++) {
+                    if (wybor == -2) poprawnie = true;
+                }
+                if (poprawnie) wynik++;
+            } else {
+                if (wybor == p.getIndeksPoprawnej()) wynik++;
+            }
+        }
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        long sekundy = totalTime / 1000;
+
+        text_tresc_pytania.setText("Koniec quizu! Twój wynik: " + wynik + "/" + listaPytan.size() +
+                "\nCzas: " + sekundy + " s");
+        radioGroup.setVisibility(View.GONE);
+        layoutCheckbox.setVisibility(View.GONE);
+        sprawdz.setVisibility(View.GONE);
+        zagrajPonownie.setVisibility(View.VISIBLE);
+    }
+
+    private void resetQuiz() {
+        wynik = 0;
+        aktualnyIndeksPytania = 0;
+        wybraneOdpowiedzi.clear();
+        text_wynik.setText("Wynik: 0");
+        radioGroup.setVisibility(View.VISIBLE);
+        sprawdz.setVisibility(View.VISIBLE);
+        layoutCheckbox.setVisibility(View.GONE);
+        zagrajPonownie.setVisibility(View.GONE);
+
+        startTime = System.currentTimeMillis();
+
+        wyswietlPytanie();
+    }
+}
+
+
+
+themes:
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.ProstyQuiz" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:navigationBarColor">@color/purple_500</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
+</resources>
+
+
+
+colors:
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <color name="white">#FFFFFF</color>
+        <color name="black">#000000</color>
+        <color name="purple_500">#6200EE</color>
+        <color name="purple_700">#3700B3</color>
+        <color name="teal_200">#03DAC5</color>
+        <color name="teal_700">#018786</color>
+
+        <color name="poprawna_odpowiedz">#A5D6A7</color>
+        <color name="bledna_odpowiedz">#EF9A9A</color>
+        <color name="normalna_odpowiedz">#FFFFFF</color>
+</resources>
+
+
+
+pytanie.java:
 
 package com.example.prostyquiz;
 
@@ -9,11 +349,21 @@ public class Pytanie {
     private String tresc;
     private ArrayList<String> odpowiedzi;
     private int indeksPoprawnej;
+    private ArrayList<Integer> indeksyPoprawnych;
+    private boolean czyWielokrotnyWybor;
 
     public Pytanie(String tresc, ArrayList<String> odpowiedzi, int indeksPoprawnej) {
         this.tresc = tresc;
         this.odpowiedzi = odpowiedzi;
         this.indeksPoprawnej = indeksPoprawnej;
+        this.czyWielokrotnyWybor = false;
+    }
+
+    public Pytanie(String tresc, ArrayList<String> odpowiedzi, ArrayList<Integer> indeksyPoprawnych, boolean wielokrotny) {
+        this.tresc = tresc;
+        this.odpowiedzi = odpowiedzi;
+        this.indeksyPoprawnych = indeksyPoprawnych;
+        this.czyWielokrotnyWybor = wielokrotny;
     }
 
     public String getTresc() {
@@ -27,57 +377,14 @@ public class Pytanie {
     public int getIndeksPoprawnej() {
         return indeksPoprawnej;
     }
+
+    public ArrayList<Integer> getIndeksyPoprawnych() {
+        return indeksyPoprawnych;
+    }
+
+    public boolean isCzyWielokrotnyWybor() {
+        return czyWielokrotnyWybor;
+    }
+
 }
 
-
-
-
-
-xml:
-
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp">
-
-    <TextView
-        android:id="@+id/tekstNumerPytania"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pytanie 1/5"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
-
-    <TextView
-        android:id="@+id/tekstTrescPytania"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Treść pytania"
-        android:textSize="18sp"
-        android:layout_marginBottom="16dp"/>
-
-    <RadioGroup
-        android:id="@+id/radioGroupOdpowiedzi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp">
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/przyciskSprawdz"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sprawdź odpowiedź" />
-
-    <TextView
-        android:id="@+id/tekstWynik"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Wynik: 0"
-        android:textSize="18sp"
-        android:layout_marginTop="24dp"/>
-
-</LinearLayout>
