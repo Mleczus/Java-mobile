@@ -1,0 +1,210 @@
+MainActivity:
+
+package com.example.lista_szczegoly;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
+        String[] produkty = {"Chleb", "Mleko", "Jajka", "Masło", "Ser", "Szynka", "Pomidory"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.wiersz_produktu, R.id.mojtekst,  produkty);
+
+        ListView listView = findViewById(R.id.listaProduktow);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String kliknietyProdukt = produkty[position];
+                int numerProduktu = position + 1;
+
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("KLUCZ_NAZWA", kliknietyProdukt);
+                intent.putExtra("KLUCZ_NUMER", numerProduktu);
+                startActivity(intent);
+            }
+        });
+    }
+}
+
+
+activity_main.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lista Zakupów"
+        android:textSize="24sp"
+        android:layout_marginBottom="16dp"/>
+
+    <ListView
+        android:id="@+id/listaProduktow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>
+
+
+DetailActivity:
+
+package com.example.lista_szczegoly;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class DetailActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_detail);
+
+        TextView tvNazwa = findViewById(R.id.tvNazwaProduktu);
+        TextView tvOpis = findViewById(R.id.tvOpisProduktu);
+        Button wroc = findViewById(R.id.wroc_do_listy);
+
+        wroc.setOnClickListener(v-> {
+            Intent intent = new Intent(DetailActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        Intent intent = getIntent();
+        String przekazanaNazwa = intent.getStringExtra("KLUCZ_NAZWA");
+        int przekazanyNumer = intent.getIntExtra("KLUCZ_NUMER", 0);
+
+        tvNazwa.setText("Wybrałeś produkt nr " + przekazanyNumer + ": " + przekazanaNazwa);
+
+        String opis = "";
+
+        switch (przekazanaNazwa){
+            case "Mleko":
+                opis += "Świeże, 3.2%";
+                break;
+            case "Chleb":
+                opis += "Pełnoziarnisty";
+                break;
+            case "Jajka":
+                opis += "Świeże, z wolnego wybiegu";
+                break;
+            case "Masło":
+                opis += "Ekstra bez dodatków";
+                break;
+            case "Ser":
+                opis += "Królewski z dziurami";
+                break;
+            case "Szynka":
+                opis += "Barmańska z beczki";
+                break;
+            case "Pomidory":
+                opis += "Malinowe";
+                break;
+        }
+
+        tvOpis.setText(opis);
+    }
+}
+
+
+activity_detail.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DetailActivity"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvNazwaProduktu"
+        android:textSize="25sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvOpisProduktu"
+        android:textSize="15sp"
+        android:textStyle="bold"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wróć do listy"
+        android:id="@+id/wroc_do_listy"/>
+
+</LinearLayout>
+
+
+wiersz_produktu.xml(paczka do ListView):
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mojtekst"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="#008FFF"
+        android:textAllCaps="true"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/xdd"/>
+
+</LinearLayout>
