@@ -1,0 +1,183 @@
+MainActivity:
+
+package com.example.edytorprofilu;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final int KOD_EDYCJI_PROFILU = 101;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
+        Button przyciskEdytuj = findViewById(R.id.przyciskEdytuj);
+        TextView textviewImie = findViewById(R.id.tekstImie);
+        TextView textviewWiek = findViewById(R.id.tekstWiek);
+
+        przyciskEdytuj.setOnClickListener(v-> {
+            String imie = textviewImie.getText().toString();
+            String wiek = textviewWiek.getText().toString();
+
+            Intent intent = new Intent(MainActivity.this, EdytujProfilActivity.class);
+            intent.putExtra("imie", imie);
+            intent.putExtra("wiek", wiek);
+
+            startActivityForResult(intent, KOD_EDYCJI_PROFILU);
+        });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == KOD_EDYCJI_PROFILU && resultCode == RESULT_OK) {
+            String noweImie = data.getStringExtra("imie");
+            String nowyWiek = data.getStringExtra("wiek");
+
+            TextView tekstImie = findViewById(R.id.tekstImie);
+            TextView tekstWiek = findViewById(R.id.tekstWiek);
+
+            tekstImie.setText(noweImie);
+            tekstWiek.setText(nowyWiek);
+        }
+    }
+}
+
+
+activity_main.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tekstImie"
+        android:text="Imie: Jan"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tekstWiek"
+        android:text="Wiek: 23"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/przyciskEdytuj"
+        android:text="Edytuj profil"
+        android:textStyle="bold"/>
+
+</LinearLayout>
+
+
+EdytujProfilActivity:
+
+package com.example.edytorprofilu;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class EdytujProfilActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_edytuj_profil);
+
+        EditText editImie = findViewById(R.id.poleImie);
+        EditText editWiek = findViewById(R.id.poleWiek);
+
+        Intent intent = getIntent();
+        String imie = intent.getStringExtra("imie");
+        String wiek = intent.getStringExtra("wiek");
+
+        editImie.setText(imie);
+        editWiek.setText(wiek);
+
+        Button przyciskZapisz = findViewById(R.id.przyciskZapisz);
+
+        przyciskZapisz.setOnClickListener(v -> {
+
+            String noweImie = editImie.getText().toString();
+            String nowyWiek = editWiek.getText().toString();
+
+            Intent intentWynikowy = new Intent();
+
+            intentWynikowy.putExtra("imie", noweImie);
+            intentWynikowy.putExtra("wiek", nowyWiek);
+
+            setResult(Activity.RESULT_OK, intentWynikowy);
+
+            finish();
+        });
+
+    }
+}
+
+
+activity_edytuj_profil.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EdytujProfilActivity"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/poleImie"
+        android:hint="Wpisz imie..."/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/poleWiek"
+        android:hint="Wpisz wiek..."
+        android:inputType="number"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/przyciskZapisz"
+        android:text="Zapisz zmiany"/>
+
+</LinearLayout>
