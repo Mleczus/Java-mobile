@@ -5,17 +5,24 @@ package com.example.edytorprofilu;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int KOD_EDYCJI_PROFILU = 101;
+    private static final int KOD_AWATARA = 103;
+
+    public static final String KLUCZ_IMIE = "klucz_imie";
+    public static final String KLUCZ_WIEK = "klucz_wiek";
+    public static final String KLUCZ_AWATAR = "klucz_awatar";
+
+    TextView tekstImie, tekstWiek;
+    ImageView imageAwatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,34 +30,47 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        Button przyciskEdytuj = findViewById(R.id.przyciskEdytuj);
-        TextView textviewImie = findViewById(R.id.tekstImie);
-        TextView textviewWiek = findViewById(R.id.tekstWiek);
+        tekstImie = findViewById(R.id.tekstImie);
+        tekstWiek = findViewById(R.id.tekstWiek);
+        imageAwatar = findViewById(R.id.imageAwatar);
 
-        przyciskEdytuj.setOnClickListener(v-> {
-            String imie = textviewImie.getText().toString();
-            String wiek = textviewWiek.getText().toString();
+        Button btnEdytuj = findViewById(R.id.przyciskEdytuj);
+        Button btnAwatar = findViewById(R.id.przyciskAwatar);
 
-            Intent intent = new Intent(MainActivity.this, EdytujProfilActivity.class);
-            intent.putExtra("imie", imie);
-            intent.putExtra("wiek", wiek);
-
-            startActivityForResult(intent, KOD_EDYCJI_PROFILU);
+        btnEdytuj.setOnClickListener(v -> {
+            Intent i = new Intent(this, EdytujProfilActivity.class);
+            i.putExtra(KLUCZ_IMIE, tekstImie.getText().toString());
+            i.putExtra(KLUCZ_WIEK, tekstWiek.getText().toString());
+            startActivityForResult(i, KOD_EDYCJI_PROFILU);
         });
+
+        btnAwatar.setOnClickListener(v ->
+                startActivityForResult(
+                        new Intent(this, WybierzAwatarActivity.class),
+                        KOD_AWATARA)
+        );
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == KOD_EDYCJI_PROFILU && resultCode == RESULT_OK) {
-            String noweImie = data.getStringExtra("imie");
-            String nowyWiek = data.getStringExtra("wiek");
+        if (resultCode == RESULT_CANCELED) {
+            Toast.makeText(this, "Edycja anulowana.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            TextView tekstImie = findViewById(R.id.tekstImie);
-            TextView tekstWiek = findViewById(R.id.tekstWiek);
+        if (resultCode == RESULT_OK && data != null) {
 
-            tekstImie.setText(noweImie);
-            tekstWiek.setText(nowyWiek);
+            if (requestCode == KOD_EDYCJI_PROFILU) {
+                tekstImie.setText(data.getStringExtra(KLUCZ_IMIE));
+                tekstWiek.setText(data.getStringExtra(KLUCZ_WIEK));
+            }
+
+            if (requestCode == KOD_AWATARA) {
+                imageAwatar.setImageResource(
+                        data.getIntExtra(KLUCZ_AWATAR, 0));
+            }
         }
     }
 }
@@ -59,36 +79,44 @@ public class MainActivity extends AppCompatActivity {
 activity_main.xml:
 
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    android:gravity="center"
     android:orientation="vertical"
-    android:gravity="center">
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imageAwatar"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/avatar1"/>
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/tekstImie"
-        android:text="Imie: Jan"/>
+        android:text="Jan"
+        android:textSize="18sp"
+        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/tekstWiek"
-        android:text="Wiek: 23"/>
+        android:text="23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/przyciskEdytuj"
         android:text="Edytuj profil"
-        android:textStyle="bold"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
+    <Button
+        android:id="@+id/przyciskAwatar"
+        android:text="Zmień awatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>
 
 
@@ -101,83 +129,119 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class EdytujProfilActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_edytuj_profil);
 
-        EditText editImie = findViewById(R.id.poleImie);
-        EditText editWiek = findViewById(R.id.poleWiek);
+        EditText imie = findViewById(R.id.poleImie);
+        EditText wiek = findViewById(R.id.poleWiek);
+        Button zapisz = findViewById(R.id.przyciskZapisz);
 
-        Intent intent = getIntent();
-        String imie = intent.getStringExtra("imie");
-        String wiek = intent.getStringExtra("wiek");
+        Intent i = getIntent();
+        imie.setText(i.getStringExtra(MainActivity.KLUCZ_IMIE));
+        wiek.setText(i.getStringExtra(MainActivity.KLUCZ_WIEK));
 
-        editImie.setText(imie);
-        editWiek.setText(wiek);
+        zapisz.setOnClickListener(v -> {
+            if (imie.getText().toString().trim().isEmpty()) {
+                Toast.makeText(this, "Imię nie może być puste", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        Button przyciskZapisz = findViewById(R.id.przyciskZapisz);
+            Intent wynik = new Intent();
+            wynik.putExtra(MainActivity.KLUCZ_IMIE, imie.getText().toString());
+            wynik.putExtra(MainActivity.KLUCZ_WIEK, wiek.getText().toString());
 
-        przyciskZapisz.setOnClickListener(v -> {
-
-            String noweImie = editImie.getText().toString();
-            String nowyWiek = editWiek.getText().toString();
-
-            Intent intentWynikowy = new Intent();
-
-            intentWynikowy.putExtra("imie", noweImie);
-            intentWynikowy.putExtra("wiek", nowyWiek);
-
-            setResult(Activity.RESULT_OK, intentWynikowy);
-
+            setResult(Activity.RESULT_OK, wynik);
             finish();
         });
-
     }
 }
 
 
 activity_edytuj_profil.xml:
 
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EdytujProfilActivity"
+    android:gravity="center"
     android:orientation="vertical"
-    android:gravity="center">
+    android:padding="16dp">
 
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/poleImie"
-        android:hint="Wpisz imie..."/>
+        android:hint="Imię"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/poleWiek"
-        android:hint="Wpisz wiek..."
-        android:inputType="number"/>
+        android:hint="Wiek"
+        android:inputType="number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/przyciskZapisz"
-        android:text="Zapisz zmiany"/>
+        android:text="Zapisz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
 
+
+WybierzAvatarActivity:
+
+package com.example.edytorprofilu;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class WybierzAwatarActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_wybierz_awatar);
+
+        findViewById(R.id.avatar1).setOnClickListener(v -> zwroc(R.drawable.avatar1));
+        findViewById(R.id.avatar2).setOnClickListener(v -> zwroc(R.drawable.avatar2));
+    }
+
+    void zwroc(int id) {
+        Intent i = new Intent();
+        i.putExtra(MainActivity.KLUCZ_AWATAR, id);
+        setResult(RESULT_OK, i);
+        finish();
+    }
+}
+
+
+activity_wybierz_avatar.xml:
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/avatar1"
+        android:src="@drawable/avatar1"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+
+    <ImageView
+        android:id="@+id/avatar2"
+        android:src="@drawable/avatar2"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
 </LinearLayout>
