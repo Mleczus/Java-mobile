@@ -1,0 +1,127 @@
+activity_main.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mojUklad"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/statusTekst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Czekam na start..."
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:textColor="#000000"/>
+
+    <Button
+        android:id="@+id/btnZamknij"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zamknij aplikację"
+        android:layout_marginTop="32dp"/>
+
+</LinearLayout>
+
+
+MainActivity:
+
+package com.example.monitorstanu;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.view.View;
+
+import com.example.monitorstanu.R;
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "CyklZyciaTest";
+
+    private TextView statusTekst;
+    private LinearLayout layout;
+
+    private int licznikWejsc = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        statusTekst = findViewById(R.id.statusTekst);
+        layout = findViewById(R.id.mojUklad);
+        Button btnZamknij = findViewById(R.id.btnZamknij);
+
+        Log.d(TAG, "---> Wywołano metodę: onCreate()");
+        statusTekst.setText("Stan: onCreate\n(Tworzenie)");
+
+        btnZamknij.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "---> Wywołano metodę: onStart()");
+        statusTekst.setText("Stan: onStart\n(Widoczność)");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "---> Wywołano metodę: onResume()");
+
+        licznikWejsc++;
+
+        statusTekst.setText(
+                "Stan: onResume (Aktywna!)\nWejście nr: " + licznikWejsc
+        );
+
+        statusTekst.setTextColor(android.graphics.Color.GREEN);
+
+        layout.setBackgroundColor(android.graphics.Color.WHITE);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "---> Wywołano metodę: onPause()");
+
+        statusTekst.setText("Stan: onPause\n(Wstrzymanie)");
+        statusTekst.setTextColor(android.graphics.Color.RED);
+
+        layout.setBackgroundColor(android.graphics.Color.LTGRAY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "---> Wywołano metodę: onStop()");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "---> Wywołano metodę: onRestart()");
+        statusTekst.setText("Stan: onRestart");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "---> Wywołano metodę: onDestroy()");
+    }
+}
