@@ -125,3 +125,28 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "---> Wywołano metodę: onDestroy()");
     }
 }
+
+
+////////////////////////////////////////////////////////////////
+
+
+Kolejność metod:
+
+-Uruchomienie aplikacji:
+onCreate()
+onStart()
+onResume()
+
+-Naciśnięcie HOME:
+onPause()
+onStop()
+
+-Powrót do aplikacji:
+onRestart()
+onStart()
+onResume()
+
+-Naciśnięcie WSTECZ (zamknięcie):
+onPause()
+onStop()
+onDestroy()
