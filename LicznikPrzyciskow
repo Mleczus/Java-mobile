@@ -1,0 +1,197 @@
+// xml:  
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tekstLicznik"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/przyciskDodaj"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dodaj" />
+
+        <TextView
+            android:id="@+id/tekstHistoria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:paddingTop="8dp" />
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Wpisz coś" />
+
+        <TextView
+            android:id="@+id/tekstA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="20sp"
+            android:paddingTop="16dp" />
+
+        <Button
+            android:id="@+id/przyciskA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dodaj punkt A" />
+
+        <TextView
+            android:id="@+id/tekstB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="20sp"
+            android:paddingTop="8dp" />
+
+        <Button
+            android:id="@+id/przyciskB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dodaj punkt B" />
+
+        <Switch
+            android:id="@+id/switchDogrywka"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tryb dogrywki"
+            android:paddingTop="16dp" />
+
+        <TextView
+            android:id="@+id/tekstDogrywka"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dogrywka OFF" />
+
+    </LinearLayout>
+
+</ScrollView>
+
+
+
+// MainActivity:
+
+package com.example.licznik_przyciskow;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Switch;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private int licznik = 0;
+    private String historia = "";
+    private int punktyDruzynaA = 0;
+    private int punktyDruzynaB = 0;
+    private boolean czyDogrywka = false;
+
+    private TextView tekstLicznik;
+    private TextView tekstHistoria;
+    private TextView tekstA;
+    private TextView tekstB;
+    private TextView tekstDogrywka;
+    private EditText editText;
+    private Switch switchDogrywka;
+
+    private static final String KLUCZ_LICZNIKA = "licznik";
+    private static final String KLUCZ_HISTORIA = "historia";
+    private static final String KLUCZ_A = "punktyA";
+    private static final String KLUCZ_B = "punktyB";
+    private static final String KLUCZ_DOGRYWKA = "dogrywka";
+    private static final String TAG = "LOG_APP";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
+        tekstLicznik = findViewById(R.id.tekstLicznik);
+        tekstHistoria = findViewById(R.id.tekstHistoria);
+        tekstA = findViewById(R.id.tekstA);
+        tekstB = findViewById(R.id.tekstB);
+        tekstDogrywka = findViewById(R.id.tekstDogrywka);
+        editText = findViewById(R.id.editText);
+        switchDogrywka = findViewById(R.id.switchDogrywka);
+
+        Button przyciskDodaj = findViewById(R.id.przyciskDodaj);
+        Button przyciskA = findViewById(R.id.przyciskA);
+        Button przyciskB = findViewById(R.id.przyciskB);
+
+        if (savedInstanceState != null) {
+            licznik = savedInstanceState.getInt(KLUCZ_LICZNIKA);
+            historia = savedInstanceState.getString(KLUCZ_HISTORIA);
+            punktyDruzynaA = savedInstanceState.getInt(KLUCZ_A);
+            punktyDruzynaB = savedInstanceState.getInt(KLUCZ_B);
+            czyDogrywka = savedInstanceState.getBoolean(KLUCZ_DOGRYWKA);
+
+            tekstLicznik.setText(String.valueOf(licznik));
+            tekstHistoria.setText(historia);
+            tekstA.setText(String.valueOf(punktyDruzynaA));
+            tekstB.setText(String.valueOf(punktyDruzynaB));
+            switchDogrywka.setChecked(czyDogrywka);
+            tekstDogrywka.setText(czyDogrywka ? "Dogrywka ON" : "Dogrywka OFF");
+
+            Log.d(TAG, "Odtwarzam stan licznika: " + licznik);
+        } else {
+            Log.d(TAG, "Pierwsze uruchomienie, brak zapisanego stanu.");
+        }
+
+        przyciskDodaj.setOnClickListener(v -> {
+            licznik++;
+            historia += "Klik!\n";
+            tekstLicznik.setText(String.valueOf(licznik));
+            tekstHistoria.setText(historia);
+        });
+
+        przyciskA.setOnClickListener(v -> {
+            punktyDruzynaA++;
+            tekstA.setText(String.valueOf(punktyDruzynaA));
+        });
+
+        przyciskB.setOnClickListener(v -> {
+            punktyDruzynaB++;
+            tekstB.setText(String.valueOf(punktyDruzynaB));
+        });
+
+        switchDogrywka.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            czyDogrywka = isChecked;
+            tekstDogrywka.setText(czyDogrywka ? "Dogrywka ON" : "Dogrywka OFF");
+        });
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt(KLUCZ_LICZNIKA, licznik);
+        outState.putString(KLUCZ_HISTORIA, historia);
+        outState.putInt(KLUCZ_A, punktyDruzynaA);
+        outState.putInt(KLUCZ_B, punktyDruzynaB);
+        outState.putBoolean(KLUCZ_DOGRYWKA, czyDogrywka);
+
+        Log.d(TAG, "Zapisuję stan licznika: " + licznik);
+    }
+}
