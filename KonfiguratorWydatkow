@@ -1,6 +1,8 @@
 // Wydatek.java
 
-public class Wydatek {
+import java.io.Serializable;
+
+public class Wydatek implements Serializable {
 
     private String nazwa;
     private double kwota;
@@ -101,20 +103,46 @@ public class Wydatek {
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
-        android:id="@+id/tekstPodsumowanie"
+        android:id="@+id/tekstLiczbaWydatkow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Wydatki: 0 | Suma: 0,00 zł"
+        android:text="Liczba wydatków: 0"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
         app:layout_constraintTop_toBottomOf="@id/przyciskZapisz"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tekstSumaWydatkow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Łączna suma: 0,00 zł"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tekstLiczbaWydatkow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tekstNajdrozszy"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Najdroższy: -"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tekstSumaWydatkow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/tekstPustaLista"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Brak zapisanych wydatków"
-        app:layout_constraintTop_toBottomOf="@id/tekstPodsumowanie"
+        app:layout_constraintTop_toBottomOf="@id/tekstNajdrozszy"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -269,7 +297,7 @@ public class WydatekAdapter extends RecyclerView.Adapter<WydatekAdapter.WydatekV
 
 
 
-MainActivity.java 
+// MainActivity.java 
 
 import android.os.Bundle;
 import android.view.View;
@@ -288,9 +316,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EditText nazwa, kwota;
     private Spinner spinner;
-    private TextView podsumowanie, pustaLista;
+    private TextView pustaLista;
+    private TextView tekstLiczbaWydatkow;
+    private TextView tekstSumaWydatkow;
+    private TextView tekstNajdrozszy;
+
     private RecyclerView recycler;
     private WydatekAdapter adapter;
+
+    private static final String KEY_LISTA = "lista_wydatkow";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -300,8 +334,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nazwa = findViewById(R.id.poleNazwaWydatku);
         kwota = findViewById(R.id.poleKwotaWydatku);
         spinner = findViewById(R.id.spinnerKategoria);
-        podsumowanie = findViewById(R.id.tekstPodsumowanie);
         pustaLista = findViewById(R.id.tekstPustaLista);
+
+        tekstLiczbaWydatkow = findViewById(R.id.tekstLiczbaWydatkow);
+        tekstSumaWydatkow = findViewById(R.id.tekstSumaWydatkow);
+        tekstNajdrozszy = findViewById(R.id.tekstNajdrozszy);
+
         recycler = findViewById(R.id.listaWydatkow);
         Button btn = findViewById(R.id.przyciskZapisz);
 
@@ -311,7 +349,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btn.setOnClickListener(this);
 
-        odswiez();
+        if (savedInstanceState != null) {
+            ArrayList<Wydatek> zapisane =
+                    (ArrayList<Wydatek>) savedInstanceState.getSerializable(KEY_LISTA);
+
+            if (zapisane != null) {
+                lista.clear();
+                lista.addAll(zapisane);
+                adapter.notifyDataSetChanged();
+            }
+        }
+
+        odswiezPodsumowanie();
     }
 
     @Override
@@ -339,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recycler.smoothScrollToPosition(adapter.getItemCount() - 1);
 
         wyczysc();
-        odswiez();
+        odswiezPodsumowanie();
 
         Toast.makeText(this, "Dodano", Toast.LENGTH_SHORT).show();
     }
@@ -347,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onDeleteClicked(int position) {
         adapter.usunWydatek(position);
-        odswiez();
+        odswiezPodsumowanie();
     }
 
     @Override
@@ -355,16 +404,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toast.makeText(this, w.getNazwa(), Toast.LENGTH_SHORT).show();
     }
 
-    private void odswiez() {
+    private void odswiezPodsumowanie() {
         double suma = 0;
+        Wydatek najdrozszy = null;
+        double maxKwota = 0;
+
         for (Wydatek w : lista) {
             suma += w.getKwota();
+
+            if (najdrozszy == null || w.getKwota() > maxKwota) {
+                najdrozszy = w;
+                maxKwota = w.getKwota();
+            }
         }
 
-        podsumowanie.setText(
-                "Wydatki: " + lista.size() +
-                " | Suma: " + String.format(Locale.getDefault(), "%.2f zł", suma)
+        tekstLiczbaWydatkow.setText("Liczba wydatków: " + lista.size());
+
+        tekstSumaWydatkow.setText(
+                "Łączna suma: " +
+                        String.format(Locale.getDefault(), "%.2f zł", suma)
         );
+
+        if (lista.isEmpty()) {
+            tekstNajdrozszy.setVisibility(View.GONE);
+        } else {
+            tekstNajdrozszy.setVisibility(View.VISIBLE);
+            tekstNajdrozszy.setText(
+                    "Najdroższy: " + najdrozszy.getNazwa() +
+                            " za " + String.format(Locale.getDefault(), "%.2f zł", najdrozszy.getKwota())
+            );
+        }
 
         pustaLista.setVisibility(lista.isEmpty() ? View.VISIBLE : View.GONE);
     }
@@ -373,5 +442,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nazwa.setText("");
         kwota.setText("");
         spinner.setSelection(0);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(KEY_LISTA, lista);
     }
 }
